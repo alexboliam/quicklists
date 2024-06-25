@@ -1,1 +1,21 @@
-<p>checklist works!</p>
+@if (checklist(); as checklist) {
+  <app-checklist-header
+    [checklist]="checklist"
+    (addItem)="checklistItemsBeingEdited.set({})"
+    ></app-checklist-header>
+  <app-checklist-item-list [checklistItems]="items()" />
+}
+
+<app-modal [isOpen]="!!checklistItemsBeingEdited()">
+  <ng-template>
+    <app-form-modal
+      [formGroup]="checklistItemForm"
+      title="Create Item"
+      (save)="checklistItemService.add$.next({
+        item: checklistItemForm.getRawValue(),
+        checklistId: checklist()?.id!,
+      })"
+      (close)="checklistItemsBeingEdited.set(null)"
+    ></app-form-modal>
+  </ng-template>
+</app-modal>

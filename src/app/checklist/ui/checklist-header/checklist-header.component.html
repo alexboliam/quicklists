@@ -1,1 +1,9 @@
-<p>checklist-header works!</p>
+<header>
+  <a [routerLink]="['/home']">Back</a>
+  <h1>
+    {{ checklist().title }}
+  </h1>
+  <div>
+    <button (click)="addItem.emit()">Add item</button>
+  </div>
+</header>

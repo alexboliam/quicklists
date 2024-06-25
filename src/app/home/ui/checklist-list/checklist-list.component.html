@@ -1,6 +1,6 @@
 <ul>
   @for (item of checklists(); track item.id) {
-    <li>
+    <li routerLink="/checklist/{{ item.id }}">
       <a>{{ item.title }}</a>
     </li>
   } @empty {

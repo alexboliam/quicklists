@@ -2,6 +2,7 @@ import { Injectable, computed, signal } from "@angular/core";
 import { AddChecklist, Checklist } from "../interfaces/checklist";
 import { Subject } from "rxjs";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GuidHelper } from "../utils/guid.helper";
 
 export interface ChecklistState {
   checklists: Checklist[]
@@ -36,21 +37,7 @@ export class ChecklistService {
   private addIdToChecklist(checklist: AddChecklist): Checklist {
     return {
       ...checklist,
-      id: this.generateSlug(checklist.title),
+      id: GuidHelper.CreateGuid(),
     }
-  }
-
-  private generateSlug(title: string): string {
-    let slug = title.toLowerCase().replace(/\s+/g, '-');
-
-    const matchingSlugs = this.checklists().find(
-      (checklist) => checklist.id === slug
-    );
-
-    if (matchingSlugs) {
-      slug = slug + Date.now().toString()
-    }
-
-    return slug;
   }
 }
