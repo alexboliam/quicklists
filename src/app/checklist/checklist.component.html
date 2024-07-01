@@ -2,8 +2,9 @@
   <app-checklist-header
     [checklist]="checklist"
     (addItem)="checklistItemsBeingEdited.set({})"
+    (resetChecklist)="checklistItemService.resetToggles$.next($event)"
     ></app-checklist-header>
-  <app-checklist-item-list [checklistItems]="items()" />
+  <app-checklist-item-list [checklistItems]="items()" (toggle)="checklistItemService.toggle$.next($event)" />
 }
 
 <app-modal [isOpen]="!!checklistItemsBeingEdited()">

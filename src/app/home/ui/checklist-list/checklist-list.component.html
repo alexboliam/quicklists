@@ -1,7 +1,11 @@
 <ul>
   @for (item of checklists(); track item.id) {
-    <li routerLink="/checklist/{{ item.id }}">
-      <a>{{ item.title }}</a>
+    <li>
+      <a routerLink="/checklist/{{ item.id }}">{{ item.title }}</a>
+      <div>
+        <button (click)="edit.emit(item)">Edit</button>
+        <button (click)="delete.emit(item.id)">Delete</button>
+      </div>
     </li>
   } @empty {
     <p>Click the add button to create your first checklist!</p>
