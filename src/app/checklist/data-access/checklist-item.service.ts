@@ -69,6 +69,7 @@ export class ChecklistItemService {
               {
                 ...checklistItem.item,
                 id: GuidHelper.CreateGuid(),
+                createdDate: new Date(),
                 checklistId: checklistItem.checklistId,
                 checked: false
               }
@@ -82,7 +83,11 @@ export class ChecklistItemService {
           this.state.update((state) => ({
             ...state,
             checklistItems: state.checklistItems.map((item) => 
-              item.id === checklistItemId ? { ...item, checked: !item.checked } : item
+              item.id === checklistItemId ? {
+                ...item,
+                checked: !item.checked,
+                closedDate: !item.checked ? new Date() : undefined
+              } : item
             )
           }))
       );
@@ -93,7 +98,7 @@ export class ChecklistItemService {
           this.state.update((state) => ({
             ...state,
             checklistItems: state.checklistItems.map((item) => 
-              item.checklistId === checklistId ? { ...item, checked: false } : item
+              item.checklistId === checklistId ? { ...item, checked: false, closedDate: undefined } : item
             )
           }))
       );

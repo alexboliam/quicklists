@@ -1,7 +1,9 @@
 <header>
-  <a [routerLink]="['/home']">Back</a>
+  <button class="back-btn">
+    <a [routerLink]="['/home']">Back</a>
+  </button>
   <h1>
-    {{ checklist().title }}
+    {{ checklist().title }} [{{ checkedNum() }}/{{ itemsNum() }}]
   </h1>
   <div>
     <button (click)="resetChecklist.emit(checklist().id)">Reset</button>

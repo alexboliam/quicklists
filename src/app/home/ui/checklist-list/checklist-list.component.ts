@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import { Checklist, RemoveChecklist } from '../../../shared/interfaces/checklist';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-checklist-list',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './checklist-list.component.html',
   styleUrl: './checklist-list.component.less'
 })

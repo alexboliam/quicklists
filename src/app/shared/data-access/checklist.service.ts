@@ -59,7 +59,7 @@ export class ChecklistService {
       .subscribe((checklist) => 
         this.state.update((state) => ({
           ...state,
-          checklists: [...state.checklists, this.addIdToChecklist(checklist)],
+          checklists: [...state.checklists, this.addInitDataToChecklist(checklist)],
         })
       ));
 
@@ -82,9 +82,10 @@ export class ChecklistService {
     );
   }
 
-  private addIdToChecklist(checklist: AddChecklist): Checklist {
+  private addInitDataToChecklist(checklist: AddChecklist): Checklist {
     return {
       ...checklist,
+      dateCreated: new Date(),
       id: GuidHelper.CreateGuid(),
     }
   }

@@ -1,8 +1,8 @@
-<header>
+<header class="app-modal-header">
   <h2>{{ title() }}</h2>
   <button (click)="close.emit()">close</button>
 </header>
-<section>
+<section class="app-modal-section">
   <form [formGroup]="formGroup()" (ngSubmit)="save.emit(); close.emit();">
     @for (control of formGroup().controls | keyvalue; track control.key) {
       <div>

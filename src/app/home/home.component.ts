@@ -31,7 +31,7 @@ export default class HomeComponent {
         this.checklistForm.reset();
       } else {
         this.checklistForm.patchValue({
-          title: checklist.title,
+          title: checklist.title
         })
       }
     });

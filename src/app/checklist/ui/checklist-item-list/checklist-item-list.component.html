@@ -1,15 +1,25 @@
 <section>
   <ul>
     @for (item of checklistItems(); track item.id) {
-      <li>
-        <div>
-          @if (item.checked) {
-            <span>✅</span>
-          }
-          {{ item.title }}
+      <li [ngClass]="{'checked': item.checked}">
+        <div class="item-content">
+          <p>{{ item.title }}</p>
+          <p class="date-text">
+            <span>
+              {{ item.createdDate | date:'dd/MM/YYYY HH:mm' }}
+            </span>
+            @if (item.closedDate)
+            {
+              <span>
+                - {{ item.closedDate | date:'dd/MM/YYYY HH:mm'}}
+              </span>
+            }
+          </p>
         </div>
         <div>
           <button (click)="toggle.emit(item.id)">Toggle</button>
+          <button (click)="edit.emit(item)">Edit</button>
+          <button (click)="delete.emit(item.id)">Delete</button>
         </div>
       </li>
     } @empty {

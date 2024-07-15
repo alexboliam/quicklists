@@ -1,1 +1,95 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-primary: #81ecec;
+  --color-secondary: #ffeaa7;
+  --color-btn-600: #1997a1;
+  --color-btn-700: #1b7983;
+  --color-dark: #333;
+  --color-dark-secondary: #555;
+  --color-light: #ffffff;
+  --color-gradient: linear-gradient(319deg, #81ecec, #ffeaa7);
+  --color-overlay-dark: #3333339c;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-gradient);
+  font-family: "Roboto", sans-serif;
+  color: var(--color-dark);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-light);
+  padding: 1.5rem;
+  margin: 1rem;
+  border-radius: 30px;
+}
+
+.app-modal-section {
+  min-height: 50%;
+  margin:1rem;
+  padding: 2rem;
+  background: var(--color-light);
+  border-radius: 30px;
+
+  label {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--color-dark-secondary);
+    text-transform: capitalize;
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    min-height: 30px;
+    min-width: 300px;
+    max-width: 600px;
+    width: 100%;
+    font-size: 1.2rem;
+    color: var(--color-dark);
+    border: 2px solid var(--color-primary);
+    border-radius: 10px;
+    padding: 0.5rem;
+
+    &:focus {
+      outline-color: var(--color-dark);
+    }
+  }
+
+  button {
+    margin-top: 1rem;
+  }
+}
+
+button {
+  min-height: 30px;
+  background: transparent;
+  border: 2px solid var(--color-btn-600);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: var(--color-btn-600);
+  font-weight: 600;
+  padding: 10px 20px;
+
+  &:hover {
+    cursor: pointer;
+    border-color: var(--color-btn-700);
+    color: var(--color-btn-700);
+  }
+}
+
+.dialog-container {
+  position: absolute !important;
+  overflow: hidden;
+  background: var(--color-overlay-dark);
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}

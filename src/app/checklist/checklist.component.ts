@@ -41,7 +41,7 @@ export default class ChecklistComponent {
     this.checklistItemService
       .checklistItems()
       .filter((item) => item.checklistId === this.params()?.get('id'))
-  );
+  );  
 
   constructor() {
     effect(() => {
@@ -49,6 +49,10 @@ export default class ChecklistComponent {
 
       if (!checklistItem) {
         this.checklistItemForm.reset();
+      } else {
+        this.checklistItemForm.patchValue({
+          title: checklistItem.title,
+        })
       }
     });
   }
