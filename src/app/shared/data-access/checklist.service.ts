@@ -1,10 +1,11 @@
 import { Injectable, computed, effect, inject, signal } from "@angular/core";
 import { AddChecklist, Checklist, EditChecklist } from "../interfaces/checklist";
-import { Subject } from "rxjs";
+import { EMPTY, map, merge, Subject } from "rxjs";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GuidHelper } from "../utils/guid.helper";
 import { StorageService } from "./storage.service";
 import { ChecklistItemService } from "../../checklist/data-access/checklist-item.service";
+import { connect } from 'ngxtension/connect';
 
 export interface ChecklistState {
   checklists: Checklist[];
@@ -34,6 +35,7 @@ export class ChecklistService {
   add$ = new Subject<AddChecklist>();
   remove$ = this.checklistItemService.checklistRemoved$;
   edit$ = new Subject<EditChecklist>();
+  private error$ = new Subject<string>();
 
   constructor() {
     // effects
@@ -43,43 +45,31 @@ export class ChecklistService {
       }
     });
 
-    // reducers
-    this.checklistsLoaded$.pipe(takeUntilDestroyed()).subscribe({
-      next: (checklists) =>
-        this.state.update((state) => ({
-          ...state,
-          checklists,
-          loaded: true,
-        })),
-      error: (err) => this.state.update((state) => ({ ...state, error: err })),
-    });
-
-    this.add$
-      .pipe(takeUntilDestroyed())
-      .subscribe((checklist) => 
-        this.state.update((state) => ({
-          ...state,
-          checklists: [...state.checklists, this.addInitDataToChecklist(checklist)],
-        })
-      ));
-
-    this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
-      this.state.update((state) => ({
-        ...state,
-        checklists: state.checklists.filter((checklist) => checklist.id !== id),
-      }))
+    // reducers using ngxtension
+    const nextState$ = merge(
+      this.checklistsLoaded$.pipe(
+        map((checklists) => ({ checklists, loaded: true }))
+      ),
+      this.error$.pipe(
+        map((error) => ({ error }))
+      ),
     );
 
-    this.edit$.pipe(takeUntilDestroyed()).subscribe((update) =>
-      this.state.update((state) => ({
-        ...state,
+    connect(this.state)
+      .with(nextState$)
+      .with(this.add$, (state, checklist) => ({
+        checklists: [...state.checklists, this.addInitDataToChecklist(checklist)],
+      }))
+      .with(this.remove$, (state, id) => ({
+        checklists: state.checklists.filter((checklist) => checklist.id !== id)
+      }))
+      .with(this.edit$, (state, update) => ({
         checklists: state.checklists.map((checklist) =>
           checklist.id === update.id
             ? { ...checklist, title: update.data.title }
             : checklist
-        ),
-      }))
-    );
+        )
+      }));
   }
 
   private addInitDataToChecklist(checklist: AddChecklist): Checklist {

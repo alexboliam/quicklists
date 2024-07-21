@@ -1,10 +1,11 @@
 import { Injectable, computed, effect, inject, signal } from "@angular/core";
 import { AddChecklistItem, ChecklistItem, EditChecklistItem, RemoveChecklistItem } from "../../shared/interfaces/checklist-item";
-import { Subject } from "rxjs";
+import { map, merge, Subject } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GuidHelper } from "../../shared/utils/guid.helper";
 import { RemoveChecklist } from "../../shared/interfaces/checklist";
 import { StorageService } from "../../shared/data-access/storage.service";
+import { connect } from "ngxtension/connect";
 
 export interface ChecklistItemsState {
   checklistItems: ChecklistItem[];
@@ -36,6 +37,7 @@ export class ChecklistItemService {
   resetToggles$ = new Subject<RemoveChecklist>();
   edit$ = new Subject<EditChecklistItem>();
   remove$ = new Subject<RemoveChecklistItem>();
+  private error$ = new Subject<string>();
 
   // shared sources
   checklistRemoved$ = new Subject<RemoveChecklist>();
@@ -49,84 +51,53 @@ export class ChecklistItemService {
     });
 
     // reducers
-    this.checklistItemsLoaded$.pipe(takeUntilDestroyed()).subscribe({
-      next: (checklistItems) =>
-        this.state.update((state) => ({
-          ...state,
-          checklistItems,
-          loaded: true,
-        })),
-      error: (err) => this.state.update((state) => ({ ...state, error: err })),
-    });
-
-    this.add$.pipe(takeUntilDestroyed())
-      .subscribe(
-        (checklistItem) => 
-          this.state.update((state) => ({
-            ...state,
-            checklistItems: [
-              ...state.checklistItems,
-              {
-                ...checklistItem.item,
-                id: GuidHelper.CreateGuid(),
-                createdDate: new Date(),
-                checklistId: checklistItem.checklistId,
-                checked: false
-              }
-            ]
-          }))
+    const nextState$ = merge(
+      this.checklistItemsLoaded$.pipe(
+        map((checklistItems) => ({ checklistItems, loaded: true }))
+      ),
+      this.error$.pipe(
+        map((error) => ({ error }))
+      )
     );
 
-    this.toggle$.pipe(takeUntilDestroyed())
-      .subscribe(
-        (checklistItemId) => 
-          this.state.update((state) => ({
-            ...state,
-            checklistItems: state.checklistItems.map((item) => 
-              item.id === checklistItemId ? {
-                ...item,
-                checked: !item.checked,
-                closedDate: !item.checked ? new Date() : undefined
-              } : item
-            )
-          }))
-      );
-
-    this.resetToggles$.pipe(takeUntilDestroyed())
-      .subscribe(
-        (checklistId) => 
-          this.state.update((state) => ({
-            ...state,
-            checklistItems: state.checklistItems.map((item) => 
-              item.checklistId === checklistId ? { ...item, checked: false, closedDate: undefined } : item
-            )
-          }))
-      );
-
-    this.edit$.pipe(takeUntilDestroyed())
-      .subscribe((updateChecklistItem) => 
-        this.state.update((state) => ({
-          ...state,
-          checklistItems: state.checklistItems.map((item) =>
-            item.id == updateChecklistItem.id ? { ...item, ...updateChecklistItem.data } : item
-          )
-        }))
-      );
-
-    this.remove$.pipe(takeUntilDestroyed())
-      .subscribe((checklistItemId) => 
-        this.state.update((state) => ({
-          ...state,
-          checklistItems: state.checklistItems.filter((item) => item.id !== checklistItemId)
-        }))
-      );
-
-    this.checklistRemoved$.pipe(takeUntilDestroyed())
-      .subscribe((checklistId) => 
-        this.state.update((state) => ({
-          ...state,
-          checklistItems: state.checklistItems.filter((item) => item.checklistId !== checklistId)
-        }))
-      );
+    connect(this.state)
+      .with(nextState$)
+      .with(this.add$, (state, checklistItem) => ({
+        checklistItems: [
+          ...state.checklistItems,
+          {
+            ...checklistItem.item,
+            id: GuidHelper.CreateGuid(),
+            createdDate: new Date(),
+            checklistId: checklistItem.checklistId,
+            checked: false
+          }
+        ]
+      }))
+      .with(this.edit$, (state, updateChecklistItem) => ({
+        checklistItems: state.checklistItems.map((item) =>
+          item.id == updateChecklistItem.id ? { ...item, ...updateChecklistItem.data } : item
+        )
+      }))
+      .with(this.remove$, (state, checklistItemId) => ({
+        checklistItems: state.checklistItems.filter((item) => item.id !== checklistItemId)
+      }))
+      .with(this.toggle$, (state, checklistItemId) => ({
+        checklistItems: state.checklistItems.map((item) => 
+          item.id === checklistItemId ? {
+            ...item,
+            checked: !item.checked,
+            closedDate: !item.checked ? new Date() : undefined
+          } : item
+        )
+      }))
+      .with(this.resetToggles$, (state, checklistId) => ({
+        checklistItems: state.checklistItems.map((item) => 
+          item.checklistId === checklistId ? { ...item, checked: false, closedDate: undefined } : item
+        )
+      }))
+      .with(this.checklistRemoved$, (state, checklistId) => ({
+        checklistItems: state.checklistItems.filter((item) => item.checklistId !== checklistId)
+      }))
   }
 }
