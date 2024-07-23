@@ -31,7 +31,7 @@ jobs:
 
     - name: Deploy to gh pages
       run: |
-        npx angular-cli-ghpages --dir=dist/quicklists
+        npx angular-cli-ghpages --dir=dist/quicklists-demo
       env:
         CI: true
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
