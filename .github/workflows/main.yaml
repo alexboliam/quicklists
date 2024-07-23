@@ -27,11 +27,13 @@ jobs:
       run: npm install --force
       
     - name: Build Solution
-      run: npm run build
+      run: npm run build:prod
 
-    - name: Deploy to gh pages
-      run: |
-        npx angular-cli-ghpages --dir=dist/quicklists-demo
-      env:
-        CI: true
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Deploy to GitHub pages
+      uses: JamesIves/
+        github-pages-deploy-action@releases/v2
+      with:
+        ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+        BASE_BRANCH: main
+        BRANCH: gh-pages
+        FOLDER: dist/browser
